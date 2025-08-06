@@ -1,19 +1,23 @@
 // Main Application JavaScript
 class OnceHumanApp {
     constructor() {
+        console.log('OnceHumanApp constructor called');
         this.currentSection = 'home';
         this.builds = this.loadBuilds();
         this.currentTheme = this.loadTheme();
         this.currentTableLanguage = this.loadTableLanguage();
+        console.log('Calling init...');
         this.init();
     }
 
     init() {
+        console.log('Init method called');
         this.setupTheme();
         this.setupNavigation();
         this.setupSearch();
         this.setupBuildTools();
         this.loadInitialData();
+        console.log('Init completed');
     }
 
     // Theme Management
@@ -79,35 +83,47 @@ class OnceHumanApp {
     // Navigation System
     setupNavigation() {
         const navLinks = document.querySelectorAll('.nav-link');
+        console.log('Setting up navigation, found', navLinks.length, 'nav links');
         
         navLinks.forEach(link => {
+            console.log('Setting up navigation for:', link.dataset.section);
             link.addEventListener('click', (e) => {
+                console.log('Navigation link clicked:', link.dataset.section);
                 e.preventDefault();
                 
                 const section = link.dataset.section;
                 this.navigateToSection(section);
                 
                 // Update active nav item
-                document.querySelector('.nav-item.active').classList.remove('active');
+                const activeItem = document.querySelector('.nav-item.active');
+                if (activeItem) {
+                    activeItem.classList.remove('active');
+                }
                 link.parentElement.classList.add('active');
             });
         });
     }
 
     navigateToSection(section) {
+        console.log('Navigating to section:', section);
+        
         // Hide current section
         const currentSection = document.querySelector(`.content-section.active`);
         if (currentSection) {
+            console.log('Hiding current section:', currentSection.id);
             currentSection.classList.remove('active');
         }
 
         // Show new section
         const newSection = document.getElementById(`${section}-section`);
         if (newSection) {
+            console.log('Showing new section:', newSection.id);
             newSection.classList.add('active');
             this.currentSection = section;
             this.updatePageTitle(section);
             this.loadSectionContent(section);
+        } else {
+            console.error('Section not found:', `${section}-section`);
         }
     }
 
@@ -2690,5 +2706,11 @@ document.head.insertAdjacentHTML('beforeend', additionalStyles);
 // Initialize the application when DOM is loaded
 let app;
 document.addEventListener('DOMContentLoaded', () => {
-    app = new OnceHumanApp();
+    console.log('DOM Content Loaded, initializing app...');
+    try {
+        app = new OnceHumanApp();
+        console.log('App initialized successfully:', app);
+    } catch (error) {
+        console.error('Error initializing app:', error);
+    }
 });
