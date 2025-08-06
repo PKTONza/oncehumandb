@@ -2308,7 +2308,7 @@ class OnceHumanApp {
                     color: var(--text-primary);
                     display: none;
                 `;
-            }"}
+            }
 
             // Create dropdown arrow
             const arrow = document.createElement('span');
@@ -2323,7 +2323,8 @@ class OnceHumanApp {
 
             if (searchInput) {
                 displayElement.appendChild(searchInput);
-            }\n            displayElement.appendChild(arrow);
+            }
+            displayElement.appendChild(arrow);
 
             // Create dropdown list
             const dropdownList = document.createElement('div');
@@ -2344,7 +2345,7 @@ class OnceHumanApp {
             `;
             
             // Store original options for search filtering
-            const originalOptions = Array.from(selectElement.options);"
+            const originalOptions = Array.from(selectElement.options);
 
             // Function to populate/repopulate dropdown list
             const populateDropdownList = (options) => {
