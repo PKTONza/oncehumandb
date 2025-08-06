@@ -719,8 +719,16 @@ class OnceHumanApp {
                     );
                     
                     armorItems.forEach(item => {
-                        itemSelect.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+                        const option = document.createElement('option');
+                        option.value = item.name;
+                        option.textContent = item.name;
+                        option.setAttribute('data-img', item.img || '');
+                        option.setAttribute('data-gearset', item.gearset || '');
+                        itemSelect.appendChild(option);
                     });
+                    
+                    // Convert to custom select with images
+                    this.enhanceSelectWithImages(itemSelect);
                 }
             });
 
@@ -729,8 +737,16 @@ class OnceHumanApp {
             weaponSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Weapon</option>';
                 weaponsData.weapons.forEach(weapon => {
-                    select.innerHTML += `<option value="${weapon.name}">${weapon.name}</option>`;
+                    const option = document.createElement('option');
+                    option.value = weapon.name;
+                    option.textContent = weapon.name;
+                    option.setAttribute('data-img', weapon.img || '');
+                    option.setAttribute('data-type-info', weapon.type || '');
+                    select.appendChild(option);
                 });
+                
+                // Convert to custom select with images
+                this.enhanceSelectWithImages(select);
             });
 
             // Populate all mod selects with comprehensive mod list
@@ -740,8 +756,16 @@ class OnceHumanApp {
                 select.innerHTML = '<option value="">Select Mod</option>';
                 allMods.forEach(mod => {
                     const modName = mod.mod_name || mod.name || 'Unknown Mod';
-                    select.innerHTML += `<option value="${modName}">${modName}</option>`;
+                    const option = document.createElement('option');
+                    option.value = modName;
+                    option.textContent = modName;
+                    option.setAttribute('data-img', mod.img || '');
+                    option.setAttribute('data-mod-for', mod.mod_for || '');
+                    select.appendChild(option);
                 });
+                
+                // Convert to custom select with images
+                this.enhanceSelectWithImages(select);
             });
 
         } catch (error) {
@@ -803,8 +827,15 @@ class OnceHumanApp {
             if (itemSelect && sampleData[type + 's']) {
                 itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                 sampleData[type + 's'].forEach(item => {
-                    itemSelect.innerHTML += `<option value="${item}">${item}</option>`;
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    option.setAttribute('data-img', ''); // No images in fallback data
+                    itemSelect.appendChild(option);
                 });
+                
+                // Convert to custom select with images
+                this.enhanceSelectWithImages(itemSelect);
             }
         });
 
@@ -815,8 +846,15 @@ class OnceHumanApp {
             sampleData.weapons.forEach(weapon => {
                 // Handle both old string format and new object format
                 const weaponName = typeof weapon === 'string' ? weapon : weapon.name;
-                select.innerHTML += `<option value="${weaponName}">${weaponName}</option>`;
+                const option = document.createElement('option');
+                option.value = weaponName;
+                option.textContent = weaponName;
+                option.setAttribute('data-img', (typeof weapon === 'object' ? weapon.img : '') || '');
+                select.appendChild(option);
             });
+            
+            // Convert to custom select with images
+            this.enhanceSelectWithImages(select);
         });
 
         // Populate all mod selects
@@ -824,8 +862,15 @@ class OnceHumanApp {
         modSelects.forEach(select => {
             select.innerHTML = '<option value="">Select Mod</option>';
             sampleData.mods.forEach(mod => {
-                select.innerHTML += `<option value="${mod}">${mod}</option>`;
+                const option = document.createElement('option');
+                option.value = mod;
+                option.textContent = mod;
+                option.setAttribute('data-img', ''); // No images in fallback data
+                select.appendChild(option);
             });
+            
+            // Convert to custom select with images
+            this.enhanceSelectWithImages(select);
         });
 
         this.showNotification('Loaded fallback data (JSON files not available)', 'info');
@@ -2066,6 +2111,206 @@ class OnceHumanApp {
             element.innerHTML = fullDesc.replace(/\n/g, '<br>');
             element.classList.add('expanded');
         }
+    }
+
+    // Enhanced select with images
+    enhanceSelectWithImages(selectElement) {
+        try {
+            // Create custom dropdown container
+            const customContainer = document.createElement('div');
+            customContainer.className = 'custom-select-dropdown';
+            customContainer.style.cssText = `
+                position: relative;
+                width: 100%;
+            `;
+
+            // Create display element (shows selected item)
+            const displayElement = document.createElement('div');
+            displayElement.className = 'select-display';
+            displayElement.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 12px;
+                background: var(--bg-primary);
+                border: 2px solid var(--border-color);
+                border-radius: 8px;
+                cursor: pointer;
+                min-height: 45px;
+                position: relative;
+                user-select: none;
+            `;
+
+            // Create dropdown arrow
+            const arrow = document.createElement('span');
+            arrow.innerHTML = '▼';
+            arrow.style.cssText = `
+                position: absolute;
+                right: 12px;
+                color: var(--text-dim);
+                font-size: 12px;
+                pointer-events: none;
+            `;
+
+            displayElement.appendChild(arrow);
+
+            // Create dropdown list
+            const dropdownList = document.createElement('div');
+            dropdownList.className = 'dropdown-list';
+            dropdownList.style.cssText = `
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-secondary);
+                border: 2px solid var(--border-color);
+                border-radius: 8px;
+                max-height: 200px;
+                overflow-y: auto;
+                z-index: 1000;
+                display: none;
+                box-shadow: 0 4px 15px var(--shadow-dark);
+            `;
+
+            // Populate dropdown list
+            Array.from(selectElement.options).forEach((option, index) => {
+                const item = document.createElement('div');
+                item.className = 'select-option';
+                item.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    transition: background 0.2s ease;
+                `;
+
+                const img = option.getAttribute('data-img');
+                const imgElement = document.createElement('div');
+                
+                if (img && img !== '') {
+                    imgElement.innerHTML = `<img src="${img}" alt="${option.textContent}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                           <div class="no-image" style="display: none; width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
+                } else {
+                    imgElement.innerHTML = `<div class="no-image" style="width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
+                }
+
+                const textElement = document.createElement('span');
+                textElement.textContent = option.textContent;
+                textElement.style.cssText = `
+                    flex: 1;
+                    font-size: 0.9rem;
+                    color: var(--text-primary);
+                `;
+
+                item.appendChild(imgElement);
+                item.appendChild(textElement);
+
+                // Add hover effect
+                item.addEventListener('mouseenter', () => {
+                    item.style.background = 'var(--bg-tertiary)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.background = 'transparent';
+                });
+
+                // Add click handler
+                item.addEventListener('click', () => {
+                    selectElement.selectedIndex = index;
+                    selectElement.dispatchEvent(new Event('change'));
+                    this.updateSelectDisplay(displayElement, option);
+                    dropdownList.style.display = 'none';
+                });
+
+                dropdownList.appendChild(item);
+            });
+
+            // Toggle dropdown
+            displayElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = dropdownList.style.display === 'block';
+                
+                // Close all other dropdowns
+                document.querySelectorAll('.dropdown-list').forEach(list => {
+                    list.style.display = 'none';
+                });
+                
+                dropdownList.style.display = isOpen ? 'none' : 'block';
+                
+                if (!isOpen) {
+                    // Position dropdown
+                    const rect = displayElement.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const spaceAbove = rect.top;
+                    
+                    if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+                        dropdownList.style.top = 'auto';
+                        dropdownList.style.bottom = '100%';
+                    } else {
+                        dropdownList.style.top = '100%';
+                        dropdownList.style.bottom = 'auto';
+                    }
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', () => {
+                dropdownList.style.display = 'none';
+            });
+
+            // Initialize display
+            this.updateSelectDisplay(displayElement, selectElement.options[0]);
+
+            // Build custom dropdown
+            customContainer.appendChild(displayElement);
+            customContainer.appendChild(dropdownList);
+
+            // Replace original select
+            selectElement.style.display = 'none';
+            selectElement.parentNode.insertBefore(customContainer, selectElement.nextSibling);
+            
+        } catch (error) {
+            console.warn('Could not enhance select with images:', error);
+            // Fallback - just use the original select
+        }
+    }
+
+    updateSelectDisplay(displayElement, option) {
+        const arrow = displayElement.querySelector('span');
+        displayElement.innerHTML = '';
+        
+        if (option && option.value) {
+            const img = option.getAttribute('data-img');
+            const imgElement = document.createElement('div');
+            
+            if (img && img !== '') {
+                imgElement.innerHTML = `<img src="${img}" alt="${option.textContent}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                       <div class="no-image" style="display: none; width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
+            } else {
+                imgElement.innerHTML = `<div class="no-image" style="width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
+            }
+
+            const textElement = document.createElement('span');
+            textElement.textContent = option.textContent;
+            textElement.style.cssText = `
+                flex: 1;
+                font-size: 0.9rem;
+                color: var(--text-primary);
+            `;
+
+            displayElement.appendChild(imgElement);
+            displayElement.appendChild(textElement);
+        } else {
+            const placeholderText = document.createElement('span');
+            placeholderText.textContent = 'Select an item...';
+            placeholderText.style.cssText = `
+                color: var(--text-dim);
+                font-style: italic;
+            `;
+            displayElement.appendChild(placeholderText);
+        }
+        
+        displayElement.appendChild(arrow);
     }
 
     showNotification(message, type = 'info') {
