@@ -122,7 +122,8 @@ class OnceHumanApp {
             'armor': 'Armor & Equipment',
             'set-build': 'Build Creator & Manager',
             'animals': 'Animals & Companions',
-            'food': 'Food & Consumables'
+            'food': 'Food & Consumables',
+            'seasonal-challenge': 'Seasonal Challenges'
         };
         
         document.getElementById('page-title').textContent = titles[section] || 'Once Human Build Sharing';
@@ -377,6 +378,9 @@ class OnceHumanApp {
                 break;
             case 'food':
                 this.loadFood();
+                break;
+            case 'seasonal-challenge':
+                this.loadSeasonalChallenges();
                 break;
         }
     }
@@ -2574,6 +2578,133 @@ class OnceHumanApp {
                 }
             }, 300);
         }, 3000);
+    }
+
+    // Seasonal Challenge functions
+    async loadSeasonalChallenges() {
+        const container = document.getElementById('seasonal-challenge-content');
+        
+        if (container) {
+            container.innerHTML = '<p class="loading">Loading seasonal challenges...</p>';
+        }
+        
+        try {
+            const response = await fetch('data/seasonal_challenges.json');
+            const data = await response.json();
+            
+            if (data && data.seasonal_challenges) {
+                this.displaySeasonalChallenges(data.seasonal_challenges);
+                this.setupSeasonalChallengeSearch(data.seasonal_challenges);
+            } else {
+                this.showFallbackSeasonalChallenges();
+            }
+        } catch (error) {
+            console.error('Error loading seasonal challenges:', error);
+            this.showFallbackSeasonalChallenges();
+        }
+    }
+
+    displaySeasonalChallenges(challenges) {
+        const container = document.getElementById('seasonal-challenge-content');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        challenges.forEach(challenge => {
+            const card = this.createSeasonalChallengeCard(challenge);
+            container.appendChild(card);
+        });
+    }
+
+    createSeasonalChallengeCard(challenge) {
+        const card = document.createElement('div');
+        card.className = 'item-card seasonal-challenge-card';
+        card.dataset.id = challenge.id;
+
+        const cardContent = `
+            <div class="item-header">
+                <div class="item-title-section">
+                    <h3>🎯 Challenge ${challenge.id.replace('challenge_', '')}</h3>
+                </div>
+                <div class="challenge-icon">🏆</div>
+            </div>
+            <div class="item-details">
+                <div class="challenge-missions">
+                    <div class="mission-en">
+                        <strong>Mission:</strong>
+                        <p>${challenge.mission_en}</p>
+                    </div>
+                    <div class="mission-th">
+                        <strong>ภารกิจ:</strong>
+                        <p>${challenge.mission_th}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        card.innerHTML = cardContent;
+        return card;
+    }
+
+    setupSeasonalChallengeSearch(challenges) {
+        const searchInput = document.getElementById('challenge-search-input');
+        const searchBtn = document.getElementById('challenge-search-btn');
+        
+        if (!searchInput || !searchBtn) return;
+
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            this.filterSeasonalChallenges(challenges, query);
+        };
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Real-time search
+        searchInput.addEventListener('input', performSearch);
+    }
+
+    filterSeasonalChallenges(challenges, query) {
+        const container = document.getElementById('seasonal-challenge-content');
+        if (!container) return;
+
+        if (!query) {
+            this.displaySeasonalChallenges(challenges);
+            return;
+        }
+
+        const filteredChallenges = challenges.filter(challenge => 
+            challenge.mission_en.toLowerCase().includes(query.toLowerCase()) ||
+            challenge.mission_th.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filteredChallenges.length > 0) {
+            this.displaySeasonalChallenges(filteredChallenges);
+        } else {
+            container.innerHTML = '<p class="no-content">ไม่พบเควสที่ตรงกับการค้นหา</p>';
+        }
+    }
+
+    showFallbackSeasonalChallenges() {
+        const fallbackData = [
+            {
+                id: "challenge_001",
+                mission_en: "Complete daily objectives to earn rewards.",
+                mission_th: "ทำภารกิจประจำวันให้เสร็จเพื่อรับรางวัล"
+            },
+            {
+                id: "challenge_002", 
+                mission_en: "Explore new territories and mark locations.",
+                mission_th: "สำรวจดินแดนใหม่และทำเครื่องหมายตำแหน่ง"
+            }
+        ];
+
+        this.displaySeasonalChallenges(fallbackData);
+        this.setupSeasonalChallengeSearch(fallbackData);
     }
 }
 
