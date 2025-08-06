@@ -534,29 +534,38 @@ class OnceHumanApp {
             nameInput.value = build.name;
         }
 
-        // Load items data and populate selects first
-        this.loadEditorData().then(() => {
-            // Then populate current build data after selects are loaded
+        // Check if editor data is already loaded
+        const hasCustomDropdowns = modal.querySelectorAll('.custom-select-dropdown').length > 0;
+        const hasOptions = modal.querySelectorAll('select option').length > modal.querySelectorAll('select').length; // More than just default options
+        
+        if (hasCustomDropdowns || hasOptions) {
+            // Data already loaded, just populate the build
+            console.log('Editor data already loaded, populating build...');
             setTimeout(() => {
                 this.populateBuildEditor(build);
-            }, 200);
-        }).catch(error => {
-            console.error('Error in loadEditorData:', error);
-            // Load fallback data and then populate
-            this.loadFallbackData();
-            setTimeout(() => {
-                this.populateBuildEditor(build);
-            }, 200);
-        });
+            }, 100);
+        } else {
+            // Load items data and populate selects first
+            this.loadEditorData().then(() => {
+                // Then populate current build data after selects are loaded
+                setTimeout(() => {
+                    this.populateBuildEditor(build);
+                }, 200);
+            }).catch(error => {
+                console.error('Error in loadEditorData:', error);
+                // Load fallback data and then populate
+                this.loadFallbackData();
+                setTimeout(() => {
+                    this.populateBuildEditor(build);
+                }, 200);
+            });
+        }
     }
 
     closeBuildEditor() {
         const modal = document.getElementById('build-editor-modal');
         modal.classList.add('hidden');
         this.currentEditingBuildId = null;
-        
-        // Cleanup custom dropdowns to prevent duplication
-        this.cleanupCustomDropdowns();
     }
 
     saveBuildFromEditor() {
@@ -685,9 +694,6 @@ class OnceHumanApp {
     }
 
     async loadEditorData() {
-        // Cleanup existing custom dropdowns first
-        this.cleanupCustomDropdowns();
-        
         try {
             // Try to load data from JSON files (works when served via HTTP)
             const [weaponsData, armorData, modsData] = await Promise.all([
@@ -782,9 +788,6 @@ class OnceHumanApp {
     }
 
     loadFallbackData() {
-        // Cleanup existing custom dropdowns first
-        this.cleanupCustomDropdowns();
-        
         console.log('Loading fallback data for local testing...');
         
         // Enhanced fallback data in case JSON files can't be loaded
@@ -2125,14 +2128,12 @@ class OnceHumanApp {
     // Enhanced select with images
     enhanceSelectWithImages(selectElement) {
         try {
-            // Check if custom dropdown already exists and remove it
+            // Check if custom dropdown already exists - skip if already enhanced
             const existingCustom = selectElement.parentNode.querySelector('.custom-select-dropdown');
             if (existingCustom) {
-                existingCustom.remove();
+                console.log('Custom dropdown already exists, skipping enhancement');
+                return;
             }
-
-            // Show original select temporarily to avoid issues
-            selectElement.style.display = 'block';
 
             // Create custom dropdown container
             const customContainer = document.createElement('div');
@@ -2290,11 +2291,10 @@ class OnceHumanApp {
         } catch (error) {
             console.warn('Could not enhance select with images:', error);
             // Fallback - just use the original select
-            selectElement.style.display = 'block';
         }
     }
 
-    // Cleanup function to remove all custom dropdowns
+    // Cleanup function to reset selects to original state (only when really needed)
     cleanupCustomDropdowns() {
         const customDropdowns = document.querySelectorAll('.custom-select-dropdown');
         customDropdowns.forEach(dropdown => {
