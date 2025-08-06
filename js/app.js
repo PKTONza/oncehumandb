@@ -1,23 +1,19 @@
 // Main Application JavaScript
 class OnceHumanApp {
     constructor() {
-        console.log('OnceHumanApp constructor called');
         this.currentSection = 'home';
         this.builds = this.loadBuilds();
         this.currentTheme = this.loadTheme();
         this.currentTableLanguage = this.loadTableLanguage();
-        console.log('Calling init...');
         this.init();
     }
 
     init() {
-        console.log('Init method called');
         this.setupTheme();
         this.setupNavigation();
         this.setupSearch();
         this.setupBuildTools();
         this.loadInitialData();
-        console.log('Init completed');
     }
 
     // Theme Management
@@ -83,12 +79,9 @@ class OnceHumanApp {
     // Navigation System
     setupNavigation() {
         const navLinks = document.querySelectorAll('.nav-link');
-        console.log('Setting up navigation, found', navLinks.length, 'nav links');
         
         navLinks.forEach(link => {
-            console.log('Setting up navigation for:', link.dataset.section);
             link.addEventListener('click', (e) => {
-                console.log('Navigation link clicked:', link.dataset.section);
                 e.preventDefault();
                 
                 const section = link.dataset.section;
@@ -105,25 +98,19 @@ class OnceHumanApp {
     }
 
     navigateToSection(section) {
-        console.log('Navigating to section:', section);
-        
         // Hide current section
         const currentSection = document.querySelector(`.content-section.active`);
         if (currentSection) {
-            console.log('Hiding current section:', currentSection.id);
             currentSection.classList.remove('active');
         }
 
         // Show new section
         const newSection = document.getElementById(`${section}-section`);
         if (newSection) {
-            console.log('Showing new section:', newSection.id);
             newSection.classList.add('active');
             this.currentSection = section;
             this.updatePageTitle(section);
             this.loadSectionContent(section);
-        } else {
-            console.error('Section not found:', `${section}-section`);
         }
     }
 
@@ -711,7 +698,6 @@ class OnceHumanApp {
 
     async loadEditorData() {
         try {
-            console.log('Starting to load editor data from JSON files...');
             // Try to load data from JSON files (works when served via HTTP)
             const [weaponsData, armorData, modsData] = await Promise.all([
                 fetch('data/weapons.json').then(r => {
@@ -728,12 +714,6 @@ class OnceHumanApp {
                 })
             ]);
 
-            console.log('Successfully loaded JSON data:');
-            console.log('- Weapons:', weaponsData.weapons?.length || 0);
-            console.log('- Armor:', armorData.armor?.length || 0);
-            console.log('- Weapon Mods:', modsData.weapon_mods?.length || 0);
-            console.log('- Armor Mods:', modsData.armor_mods?.length || 0);
-
             // Store data for later use
             this.gameData = {
                 weapons: weaponsData.weapons,
@@ -745,7 +725,6 @@ class OnceHumanApp {
             const equipmentTypes = ['helmet', 'mask', 'top', 'bottom', 'gloves', 'shoes'];
             equipmentTypes.forEach(type => {
                 const itemSelect = document.querySelector(`[data-type="${type}"]`);
-                console.log(`Looking for equipment select with data-type="${type}":`, !!itemSelect);
                 if (itemSelect) {
                     itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                     
@@ -753,8 +732,6 @@ class OnceHumanApp {
                     const armorItems = this.gameData.armor.filter(item => 
                         item.geartype && item.geartype.toLowerCase() === type.toLowerCase()
                     );
-                    
-                    console.log(`Found ${armorItems.length} ${type} items:`, armorItems.map(item => item.name));
                     
                     armorItems.forEach(item => {
                         const option = document.createElement('option');
@@ -772,10 +749,7 @@ class OnceHumanApp {
 
             // Populate weapon selects
             const weaponSelects = document.querySelectorAll('[data-type="weapon"]');
-            console.log(`Found ${weaponSelects.length} weapon selects`);
-            console.log(`Weapons data:`, weaponsData.weapons.length, 'weapons');
-            weaponSelects.forEach((select, index) => {
-                console.log(`Populating weapon select ${index}:`, select);
+            weaponSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Weapon</option>';
                 weaponsData.weapons.forEach(weapon => {
                     const option = document.createElement('option');
@@ -785,8 +759,6 @@ class OnceHumanApp {
                     option.setAttribute('data-type-info', weapon.type || '');
                     select.appendChild(option);
                 });
-                
-                console.log(`Weapon select ${index} now has ${select.options.length} options`);
                 
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(select);
@@ -2258,11 +2230,8 @@ class OnceHumanApp {
             // Check if custom dropdown already exists - skip if already enhanced
             const existingCustom = selectElement.parentNode.querySelector('.custom-select-dropdown');
             if (existingCustom) {
-                console.log('Custom dropdown already exists, skipping enhancement for:', selectElement.dataset.type || selectElement.className);
                 return;
             }
-            
-            console.log('Enhancing select with options count:', selectElement.options.length, 'for type:', selectElement.dataset.type || selectElement.className);
 
             // Create custom dropdown container
             const customContainer = document.createElement('div');
@@ -2707,11 +2676,5 @@ document.head.insertAdjacentHTML('beforeend', additionalStyles);
 // Initialize the application when DOM is loaded
 let app;
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM Content Loaded, initializing app...');
-    try {
-        app = new OnceHumanApp();
-        console.log('App initialized successfully:', app);
-    } catch (error) {
-        console.error('Error initializing app:', error);
-    }
+    app = new OnceHumanApp();
 });
