@@ -526,9 +526,6 @@ class OnceHumanApp {
             return;
         }
         
-        // Clean up existing custom dropdowns before opening
-        this.cleanupCustomDropdowns();
-        
         modal.classList.remove('hidden');
 
         // Populate build name
@@ -556,10 +553,6 @@ class OnceHumanApp {
     closeBuildEditor() {
         const modal = document.getElementById('build-editor-modal');
         modal.classList.add('hidden');
-        
-        // Clean up custom dropdowns when closing
-        this.cleanupCustomDropdowns();
-        
         this.currentEditingBuildId = null;
     }
 
@@ -689,9 +682,6 @@ class OnceHumanApp {
     }
 
     async loadEditorData() {
-        // Clean up existing dropdowns first
-        this.cleanupCustomDropdowns();
-        
         try {
             // Try to load data from JSON files (works when served via HTTP)
             const [weaponsData, armorData, modsData] = await Promise.all([
@@ -709,40 +699,24 @@ class OnceHumanApp {
                 })
             ]);
 
-            console.log('Loaded data:', { weaponsData, armorData, modsData });
-
             // Store data for later use
             this.gameData = {
-                weapons: weaponsData.weapons || weaponsData,
-                armor: armorData.armor || armorData,
+                weapons: weaponsData.weapons,
+                armor: armorData.armor || [],
                 mods: modsData
             };
 
             // Populate equipment selects - use armor array and filter by geartype
-            // Create mapping between UI types and JSON geartype values
-            const gearTypeMapping = {
-                'helmet': ['Helmet', 'helmet'],
-                'mask': ['Mask', 'mask'],
-                'top': ['Chest', 'Top', 'chest', 'top'],
-                'bottom': ['Bottom', 'Legs', 'Pants', 'bottom', 'legs', 'pants'],
-                'gloves': ['Gloves', 'Hands', 'gloves', 'hands'],
-                'shoes': ['Boots', 'Feet', 'Shoes', 'boots', 'feet', 'shoes']
-            };
-            
             const equipmentTypes = ['helmet', 'mask', 'top', 'bottom', 'gloves', 'shoes'];
             equipmentTypes.forEach(type => {
                 const itemSelect = document.querySelector(`[data-type="${type}"]`);
                 if (itemSelect) {
-                    console.log(`Populating ${type} select...`);
                     itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                     
-                    // Filter armor by geartype using mapping
-                    const validGearTypes = gearTypeMapping[type] || [type];
+                    // Filter armor by geartype
                     const armorItems = this.gameData.armor.filter(item => 
-                        item.geartype && validGearTypes.includes(item.geartype)
+                        item.geartype && item.geartype.toLowerCase() === type.toLowerCase()
                     );
-                    
-                    console.log(`Found ${armorItems.length} ${type} items:`, armorItems);
                     
                     armorItems.forEach(item => {
                         const option = document.createElement('option');
@@ -760,19 +734,16 @@ class OnceHumanApp {
 
             // Populate weapon selects
             const weaponSelects = document.querySelectorAll('[data-type="weapon"]');
-            console.log('Populating weapon selects...', this.gameData.weapons);
             weaponSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Weapon</option>';
-                if (this.gameData.weapons) {
-                    this.gameData.weapons.forEach(weapon => {
-                        const option = document.createElement('option');
-                        option.value = weapon.name;
-                        option.textContent = weapon.name;
-                        option.setAttribute('data-img', weapon.img || '');
-                        option.setAttribute('data-type-info', weapon.type || '');
-                        select.appendChild(option);
-                    });
-                }
+                weaponsData.weapons.forEach(weapon => {
+                    const option = document.createElement('option');
+                    option.value = weapon.name;
+                    option.textContent = weapon.name;
+                    option.setAttribute('data-img', weapon.img || '');
+                    option.setAttribute('data-type-info', weapon.type || '');
+                    select.appendChild(option);
+                });
                 
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(select);
@@ -781,7 +752,6 @@ class OnceHumanApp {
             // Populate all mod selects with comprehensive mod list
             const allMods = [...(modsData.weapon_mods || []), ...(modsData.armor_mods || [])];
             const modSelects = document.querySelectorAll('.mod-select');
-            console.log('Populating mod selects...', allMods);
             modSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Mod</option>';
                 allMods.forEach(mod => {
@@ -798,8 +768,6 @@ class OnceHumanApp {
                 this.enhanceSelectWithImages(select);
             });
 
-            console.log('Editor data loaded successfully');
-
         } catch (error) {
             console.warn('Cannot load JSON files (likely CORS issue when running locally):', error);
             console.log('Using fallback data instead...');
@@ -809,9 +777,6 @@ class OnceHumanApp {
 
     loadFallbackData() {
         console.log('Loading fallback data for local testing...');
-        
-        // Clean up existing dropdowns first
-        this.cleanupCustomDropdowns();
         
         // Enhanced fallback data in case JSON files can't be loaded
         const sampleData = {
@@ -860,7 +825,6 @@ class OnceHumanApp {
         equipmentTypes.forEach(type => {
             const itemSelect = document.querySelector(`[data-type="${type}"]`);
             if (itemSelect && sampleData[type + 's']) {
-                console.log(`Populating fallback ${type} select...`);
                 itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                 sampleData[type + 's'].forEach(item => {
                     const option = document.createElement('option');
@@ -870,8 +834,6 @@ class OnceHumanApp {
                     itemSelect.appendChild(option);
                 });
                 
-                console.log(`Added ${sampleData[type + 's'].length} ${type} items`);
-                
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(itemSelect);
             }
@@ -879,7 +841,6 @@ class OnceHumanApp {
 
         // Populate weapon selects
         const weaponSelects = document.querySelectorAll('[data-type="weapon"]');
-        console.log('Populating fallback weapon selects...', weaponSelects.length, 'selects found');
         weaponSelects.forEach(select => {
             select.innerHTML = '<option value="">Select Weapon</option>';
             sampleData.weapons.forEach(weapon => {
@@ -891,8 +852,6 @@ class OnceHumanApp {
                 option.setAttribute('data-img', (typeof weapon === 'object' ? weapon.img : '') || '');
                 select.appendChild(option);
             });
-            
-            console.log(`Added ${sampleData.weapons.length} weapons to select`);
             
             // Convert to custom select with images
             this.enhanceSelectWithImages(select);
@@ -2154,42 +2113,9 @@ class OnceHumanApp {
         }
     }
 
-    // Clean up existing custom dropdowns
-    cleanupCustomDropdowns() {
-        // Remove all existing custom dropdown containers
-        const existingDropdowns = document.querySelectorAll('.custom-select-dropdown');
-        existingDropdowns.forEach(dropdown => {
-            dropdown.remove();
-        });
-        
-        // Show original select elements and reset enhancement flag
-        const allSelects = document.querySelectorAll('.item-select, .mod-select');
-        allSelects.forEach(select => {
-            select.style.display = '';
-            select.dataset.enhanced = 'false'; // Reset enhancement flag
-        });
-    }
-
     // Enhanced select with images
     enhanceSelectWithImages(selectElement) {
         try {
-            // Check if select already has been enhanced (prevent double enhancement)
-            if (selectElement.dataset.enhanced === 'true') {
-                return;
-            }
-            
-            // Clean up any existing custom dropdown for this select
-            const existingCustom = selectElement.parentNode.querySelector('.custom-select-dropdown');
-            if (existingCustom) {
-                existingCustom.remove();
-            }
-            
-            // Show original select
-            selectElement.style.display = '';
-            
-            // Mark as enhanced
-            selectElement.dataset.enhanced = 'true';
-            
             // Create custom dropdown container
             const customContainer = document.createElement('div');
             customContainer.className = 'custom-select-dropdown';
