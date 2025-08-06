@@ -2582,10 +2582,11 @@ class OnceHumanApp {
 
     // Seasonal Challenge functions
     async loadSeasonalChallenges() {
-        const container = document.getElementById('seasonal-challenge-content');
+        const cardContainer = document.getElementById('challenges-card-content');
+        const tableContainer = document.getElementById('challenges-table-content');
         
-        if (container) {
-            container.innerHTML = '<p class="loading">Loading seasonal challenges...</p>';
+        if (cardContainer) {
+            cardContainer.innerHTML = '<p class="loading">Loading seasonal challenges...</p>';
         }
         
         try {
@@ -2594,7 +2595,9 @@ class OnceHumanApp {
             
             if (data && data.seasonal_challenges) {
                 this.displaySeasonalChallenges(data.seasonal_challenges);
+                this.loadChallengesTable(data.seasonal_challenges);
                 this.setupSeasonalChallengeSearch(data.seasonal_challenges);
+                this.setupChallengesViewSwitching();
             } else {
                 this.showFallbackSeasonalChallenges();
             }
@@ -2605,7 +2608,7 @@ class OnceHumanApp {
     }
 
     displaySeasonalChallenges(challenges) {
-        const container = document.getElementById('seasonal-challenge-content');
+        const container = document.getElementById('challenges-card-content');
         if (!container) return;
 
         container.innerHTML = '';
@@ -2669,11 +2672,15 @@ class OnceHumanApp {
     }
 
     filterSeasonalChallenges(challenges, query) {
-        const container = document.getElementById('seasonal-challenge-content');
-        if (!container) return;
-
+        const cardContainer = document.getElementById('challenges-card-content');
+        const currentView = document.getElementById('challenges-card-view').classList.contains('active') ? 'card' : 'table';
+        
         if (!query) {
-            this.displaySeasonalChallenges(challenges);
+            if (currentView === 'card') {
+                this.displaySeasonalChallenges(challenges);
+            } else {
+                this.loadChallengesTable(challenges);
+            }
             return;
         }
 
@@ -2683,9 +2690,18 @@ class OnceHumanApp {
         );
 
         if (filteredChallenges.length > 0) {
-            this.displaySeasonalChallenges(filteredChallenges);
+            if (currentView === 'card') {
+                this.displaySeasonalChallenges(filteredChallenges);
+            } else {
+                this.loadChallengesTable(filteredChallenges);
+            }
         } else {
-            container.innerHTML = '<p class="no-content">ไม่พบเควสที่ตรงกับการค้นหา</p>';
+            const targetContainer = currentView === 'card' ? cardContainer : document.getElementById('challenges-table-body');
+            if (currentView === 'card') {
+                targetContainer.innerHTML = '<p class="no-content">ไม่พบเควสที่ตรงกับการค้นหา</p>';
+            } else {
+                targetContainer.innerHTML = '<tr><td colspan="4" class="no-content">ไม่พบเควสที่ตรงกับการค้นหา</td></tr>';
+            }
         }
     }
 
@@ -2694,17 +2710,283 @@ class OnceHumanApp {
             {
                 id: "challenge_001",
                 mission_en: "Complete daily objectives to earn rewards.",
-                mission_th: "ทำภารกิจประจำวันให้เสร็จเพื่อรับรางวัล"
+                mission_th: "ทำภารกิจประจำวันให้เสร็จเพื่อรับรางวัล",
+                category: "Daily"
             },
             {
                 id: "challenge_002", 
                 mission_en: "Explore new territories and mark locations.",
-                mission_th: "สำรวจดินแดนใหม่และทำเครื่องหมายตำแหน่ง"
+                mission_th: "สำรวจดินแดนใหม่และทำเครื่องหมายตำแหน่ง",
+                category: "Exploration"
             }
         ];
 
         this.displaySeasonalChallenges(fallbackData);
+        this.loadChallengesTable(fallbackData);
         this.setupSeasonalChallengeSearch(fallbackData);
+        this.setupChallengesViewSwitching();
+    }
+
+    // Table functionality for Seasonal Challenges
+    setupChallengesViewSwitching() {
+        const cardViewBtn = document.getElementById('challenges-card-view');
+        const tableViewBtn = document.getElementById('challenges-table-view');
+        const cardContent = document.getElementById('challenges-card-content');
+        const tableContent = document.getElementById('challenges-table-content');
+        
+        if (!cardViewBtn || !tableViewBtn) return;
+        
+        cardViewBtn.addEventListener('click', () => {
+            cardViewBtn.classList.add('active');
+            tableViewBtn.classList.remove('active');
+            cardContent.classList.remove('hidden');
+            tableContent.classList.add('hidden');
+        });
+        
+        tableViewBtn.addEventListener('click', () => {
+            tableViewBtn.classList.add('active');
+            cardViewBtn.classList.remove('active');
+            tableContent.classList.remove('hidden');
+            cardContent.classList.add('hidden');
+        });
+    }
+
+    loadChallengesTable(challenges) {
+        const tableBody = document.getElementById('challenges-table-body');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = '';
+        
+        challenges.forEach(challenge => {
+            const row = this.createChallengeTableRow(challenge);
+            tableBody.appendChild(row);
+        });
+        
+        // Setup table functionality
+        this.setupChallengesTableSorting();
+        this.setupChallengesTableSearch();
+        this.setupChallengesTableFilters();
+        
+        // Set initial language filter selection
+        const languageFilter = document.getElementById('challenges-language-filter');
+        if (languageFilter) {
+            languageFilter.value = this.currentTableLanguage || 'en';
+        }
+    }
+
+    createChallengeTableRow(challenge) {
+        const row = document.createElement('tr');
+        
+        // ID cell
+        const idCell = document.createElement('td');
+        idCell.innerHTML = `<div class="table-id">${challenge.id.replace('challenge_', '#')}</div>`;
+        
+        // Mission EN cell
+        const missionEnCell = document.createElement('td');
+        const missionEn = challenge.mission_en || 'N/A';
+        const truncatedMissionEn = missionEn.length > 80 ? missionEn.substring(0, 80) + '...' : missionEn;
+        missionEnCell.innerHTML = `<div class="table-description" data-lang="en" data-full-desc="${missionEn.replace(/"/g, '&quot;')}" onclick="app.toggleDescription(this)">${truncatedMissionEn}</div>`;
+        
+        // Mission TH cell
+        const missionThCell = document.createElement('td');
+        const missionTh = challenge.mission_th || 'N/A';
+        const truncatedMissionTh = missionTh.length > 80 ? missionTh.substring(0, 80) + '...' : missionTh;
+        missionThCell.innerHTML = `<div class="table-description" data-lang="th" data-full-desc="${missionTh.replace(/"/g, '&quot;')}" onclick="app.toggleDescription(this)">${truncatedMissionTh}</div>`;
+        
+        // Category cell
+        const categoryCell = document.createElement('td');
+        const category = challenge.category || 'General';
+        const categoryClass = this.getCategoryClass(category);
+        categoryCell.innerHTML = `<span class="category-badge ${categoryClass}">${category}</span>`;
+        
+        // Store data for sorting and language switching
+        row.dataset.id = challenge.id || '';
+        row.dataset.missionEn = challenge.mission_en || '';
+        row.dataset.missionTh = challenge.mission_th || '';
+        row.dataset.category = challenge.category || 'General';
+        
+        row.appendChild(idCell);
+        row.appendChild(missionEnCell);
+        row.appendChild(missionThCell);
+        row.appendChild(categoryCell);
+        
+        return row;
+    }
+
+    setupChallengesTableSorting() {
+        const headers = document.querySelectorAll('#challenges-table th.sortable');
+        
+        headers.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.dataset.column;
+                const currentSort = header.classList.contains('sort-asc') ? 'asc' : 
+                                 header.classList.contains('sort-desc') ? 'desc' : 'none';
+                
+                // Remove sort classes from all headers
+                headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+                
+                // Apply new sort
+                let newSort = 'asc';
+                if (currentSort === 'asc') newSort = 'desc';
+                else if (currentSort === 'desc') newSort = 'asc';
+                
+                header.classList.add(`sort-${newSort}`);
+                this.sortChallengesTable(column, newSort);
+            });
+        });
+    }
+
+    sortChallengesTable(column, direction) {
+        const tableBody = document.getElementById('challenges-table-body');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        
+        rows.sort((a, b) => {
+            let aVal = '';
+            let bVal = '';
+            
+            switch (column) {
+                case 'id':
+                    aVal = a.dataset.id;
+                    bVal = b.dataset.id;
+                    break;
+                case 'mission_en':
+                    aVal = a.dataset.missionEn;
+                    bVal = b.dataset.missionEn;
+                    break;
+                case 'mission_th':
+                    aVal = a.dataset.missionTh;
+                    bVal = b.dataset.missionTh;
+                    break;
+                case 'category':
+                    aVal = a.dataset.category;
+                    bVal = b.dataset.category;
+                    break;
+                default:
+                    return 0;
+            }
+            
+            if (direction === 'asc') {
+                return aVal.localeCompare(bVal);
+            } else {
+                return bVal.localeCompare(aVal);
+            }
+        });
+        
+        // Clear and re-append sorted rows
+        tableBody.innerHTML = '';
+        rows.forEach(row => tableBody.appendChild(row));
+    }
+
+    setupChallengesTableSearch() {
+        const searchInput = document.getElementById('challenges-table-search');
+        const clearBtn = document.getElementById('challenges-search-clear');
+        
+        if (!searchInput) return;
+        
+        searchInput.addEventListener('input', (e) => {
+            this.filterChallengesTable(e.target.value);
+        });
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                this.filterChallengesTable('');
+            });
+        }
+    }
+
+    setupChallengesTableFilters() {
+        const categoryFilter = document.getElementById('challenges-category-filter');
+        const languageFilter = document.getElementById('challenges-language-filter');
+        
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', (e) => {
+                this.filterChallengesTableByCategory(e.target.value);
+            });
+        }
+        
+        if (languageFilter) {
+            languageFilter.addEventListener('change', (e) => {
+                this.switchChallengesTableLanguage(e.target.value);
+            });
+        }
+    }
+
+    filterChallengesTable(searchTerm) {
+        const tableBody = document.getElementById('challenges-table-body');
+        const rows = tableBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const matches = text.includes(searchTerm.toLowerCase());
+            row.style.display = matches ? '' : 'none';
+        });
+    }
+
+    filterChallengesTableByCategory(category) {
+        const tableBody = document.getElementById('challenges-table-body');
+        const rows = tableBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            if (!category) {
+                row.style.display = '';
+            } else {
+                const matches = row.dataset.category === category;
+                row.style.display = matches ? '' : 'none';
+            }
+        });
+    }
+
+    switchChallengesTableLanguage(language) {
+        const tableBody = document.getElementById('challenges-table-body');
+        const rows = tableBody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+            const missionEnCell = row.children[1].querySelector('.table-description');
+            const missionThCell = row.children[2].querySelector('.table-description');
+            
+            if (language === 'en') {
+                // Show English mission, hide Thai
+                if (missionEnCell) missionEnCell.parentElement.style.display = '';
+                if (missionThCell) missionThCell.parentElement.style.display = 'none';
+            } else {
+                // Show Thai mission, hide English
+                if (missionEnCell) missionEnCell.parentElement.style.display = 'none';
+                if (missionThCell) missionThCell.parentElement.style.display = '';
+            }
+        });
+        
+        // Update table headers
+        const headers = document.querySelectorAll('#challenges-table th');
+        if (language === 'en') {
+            headers[1].style.display = '';
+            headers[2].style.display = 'none';
+        } else {
+            headers[1].style.display = 'none';
+            headers[2].style.display = '';
+        }
+        
+        // Save language preference
+        this.currentTableLanguage = language;
+        localStorage.setItem('challengesTableLanguage', language);
+        
+        console.log(`Challenges table language switched to: ${language}`);
+    }
+
+    getCategoryClass(category) {
+        const categoryClasses = {
+            'Combat': 'category-combat',
+            'Collection': 'category-collection', 
+            'Exploration': 'category-exploration',
+            'Crafting': 'category-crafting',
+            'Survival': 'category-survival',
+            'Building': 'category-building',
+            'Taming': 'category-taming',
+            'Quest': 'category-quest',
+            'Mining': 'category-mining',
+            'PvP': 'category-pvp'
+        };
+        return categoryClasses[category] || 'category-general';
     }
 }
 

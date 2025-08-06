@@ -1614,12 +1614,151 @@ body {
     text-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
 }
 
+#seasonal-challenge-section .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Table specific styles for Seasonal Challenges */
+#challenges-table-search {
+    flex: 1;
+    padding: 10px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#challenges-table-search:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 10px var(--border-light);
+}
+
+#challenges-table-search::placeholder {
+    color: var(--text-dim);
+}
+
+.table-id {
+    font-weight: bold;
+    color: var(--accent-primary);
+    font-size: 0.9rem;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    color: white;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+}
+
+/* Category-specific colors */
+.category-badge.category-combat {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.category-badge.category-collection {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.category-badge.category-exploration {
+    background: linear-gradient(135deg, #f39c12, #d68910);
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.category-badge.category-crafting {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    box-shadow: 0 2px 8px rgba(155, 89, 182, 0.3);
+}
+
+.category-badge.category-survival {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    box-shadow: 0 2px 8px rgba(52, 73, 94, 0.3);
+}
+
+.category-badge.category-building {
+    background: linear-gradient(135deg, #16a085, #138d75);
+    box-shadow: 0 2px 8px rgba(22, 160, 133, 0.3);
+}
+
+.category-badge.category-taming {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+}
+
+.category-badge.category-quest {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.category-badge.category-mining {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    box-shadow: 0 2px 8px rgba(149, 165, 166, 0.3);
+}
+
+.category-badge.category-pvp {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+}
+
+.category-badge.category-general {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Language switching for challenges table */
+#challenges-table th:nth-child(2),
+#challenges-table td:nth-child(2) {
+    transition: all 0.3s ease;
+}
+
+#challenges-table th:nth-child(3),
+#challenges-table td:nth-child(3) {
+    transition: all 0.3s ease;
+}
+
+/* Special styling for challenges table descriptions */
+#challenges-table .table-description {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+#challenges-table .table-description:hover {
+    background: var(--bg-tertiary);
+    color: var(--accent-primary);
+}
+
+#challenges-table .table-description.expanded {
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--accent-primary);
+    font-weight: 500;
+}
+
 /* Responsive Design for Challenge Search */
 @media (max-width: 768px) {
     #seasonal-challenge-section .section-header {
         flex-direction: column;
         gap: 15px;
         align-items: flex-start;
+    }
+    
+    #seasonal-challenge-section .header-controls {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
     }
     
     .challenge-search {
@@ -1629,6 +1768,29 @@ body {
     
     #challenge-search-input {
         font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .view-controls {
+        align-self: stretch;
+    }
+    
+    /* Table responsiveness */
+    #challenges-table {
+        font-size: 0.85rem;
+    }
+    
+    #challenges-table th,
+    #challenges-table td {
+        padding: 8px 4px;
+    }
+    
+    .table-id {
+        font-size: 0.8rem;
+    }
+    
+    .category-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
     }
 }
 

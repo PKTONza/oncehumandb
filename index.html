@@ -503,13 +503,72 @@
                 <section id="seasonal-challenge-section" class="content-section">
                     <div class="section-header">
                         <h2>Seasonal Challenge</h2>
-                        <div class="challenge-search">
-                            <input type="text" id="challenge-search-input" placeholder="ค้นหาเควสหรือภารกิจ...">
-                            <button id="challenge-search-btn">🔍</button>
+                        <div class="header-controls">
+                            <div class="challenge-search">
+                                <input type="text" id="challenge-search-input" placeholder="ค้นหาเควสหรือภารกิจ...">
+                                <button id="challenge-search-btn">🔍</button>
+                            </div>
+                            <div class="view-controls">
+                                <button id="challenges-card-view" class="view-btn active" title="Card View">
+                                    <span class="view-icon">🃏</span>
+                                    <span class="view-text">Cards</span>
+                                </button>
+                                <button id="challenges-table-view" class="view-btn" title="Table View">
+                                    <span class="view-icon">📊</span>
+                                    <span class="view-text">Table</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div id="seasonal-challenge-content" class="items-grid">
-                        <!-- Seasonal challenges will be loaded here -->
+                    
+                    <!-- Card View -->
+                    <div id="challenges-card-content" class="items-grid view-content">
+                        <!-- Seasonal challenges cards will be loaded here -->
+                    </div>
+                    
+                    <!-- Table View -->
+                    <div id="challenges-table-content" class="table-view view-content hidden">
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" id="challenges-table-search" placeholder="Search challenges...">
+                                <button id="challenges-search-clear" class="clear-btn">✖️</button>
+                            </div>
+                            <div class="table-filters">
+                                <select id="challenges-category-filter">
+                                    <option value="">All Categories</option>
+                                    <option value="Combat">Combat</option>
+                                    <option value="Collection">Collection</option>
+                                    <option value="Exploration">Exploration</option>
+                                    <option value="Crafting">Crafting</option>
+                                    <option value="Survival">Survival</option>
+                                    <option value="Building">Building</option>
+                                    <option value="Taming">Taming</option>
+                                    <option value="Quest">Quest</option>
+                                    <option value="Mining">Mining</option>
+                                    <option value="PvP">PvP</option>
+                                </select>
+                                <select id="challenges-language-filter">
+                                    <option value="en">English</option>
+                                    <option value="th">ภาษาไทย</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="challenges-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-column="id">ID</th>
+                                        <th class="sortable" data-column="mission_en">Mission (EN)</th>
+                                        <th class="sortable" data-column="mission_th">Mission (TH)</th>
+                                        <th class="sortable" data-column="category">Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="challenges-table-body">
+                                    <!-- Table rows will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
             </div>
