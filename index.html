@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Once Human Build Sharing</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>Once Human</h2>
+                <p>Build Sharing</p>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <a href="#home" class="nav-link" data-section="home">
+                        <i class="icon">🏠</i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#weapons" class="nav-link" data-section="weapons">
+                        <i class="icon">🔫</i>
+                        <span>Weapons</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#mods" class="nav-link" data-section="mods">
+                        <i class="icon">🔧</i>
+                        <span>Mods</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#armor" class="nav-link" data-section="armor">
+                        <i class="icon">🛡️</i>
+                        <span>Armor</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#set-build" class="nav-link" data-section="set-build">
+                        <i class="icon">⚙️</i>
+                        <span>Set Build</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#animals" class="nav-link" data-section="animals">
+                        <i class="icon">🐾</i>
+                        <span>Animals</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#food" class="nav-link" data-section="food">
+                        <i class="icon">🍖</i>
+                        <span>Food</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 id="page-title">Welcome to Once Human Build Sharing</h1>
+                <div class="header-controls">
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="Search items...">
+                        <button id="search-btn">🔍</button>
+                    </div>
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle Dark/Light Mode">
+                        <span class="theme-icon">🌙</span>
+                        <span class="theme-text">Dark</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Home Section -->
+                <section id="home-section" class="content-section active">
+                    <div class="welcome-card">
+                        <h2>Welcome to Once Human Build Sharing Platform</h2>
+                        <p>แชร์และค้นหา builds สำหรับเกม Once Human</p>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">🔫</div>
+                                <h3>Weapons</h3>
+                                <p>ค้นหาข้อมูลอาวุธทุกประเภท</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🔧</div>
+                                <h3>Mods</h3>
+                                <p>รายการ mods และการปรับแต่ง</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">🛡️</div>
+                                <h3>Armor</h3>
+                                <p>เกราะและเสื้อผ้าทุกชนิด</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">⚙️</div>
+                                <h3>Set Build</h3>
+                                <p>สร้างและแชร์ builds</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Other Sections (initially hidden) -->
+                <section id="weapons-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Weapons</h2>
+                        <div class="view-controls">
+                            <button id="weapons-card-view" class="view-btn active" title="Card View">
+                                <span class="view-icon">🃏</span>
+                                <span class="view-text">Cards</span>
+                            </button>
+                            <button id="weapons-table-view" class="view-btn" title="Table View">
+                                <span class="view-icon">📊</span>
+                                <span class="view-text">Table</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card View -->
+                    <div id="weapons-card-content" class="items-grid view-content">
+                        <!-- Weapons cards will be loaded here -->
+                    </div>
+                    
+                    <!-- Table View -->
+                    <div id="weapons-table-content" class="table-view view-content hidden">
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" id="weapons-table-search" placeholder="Search weapons...">
+                                <button id="weapons-search-clear" class="clear-btn">✖️</button>
+                            </div>
+                            <div class="table-filters">
+                                <select id="damage-type-filter">
+                                    <option value="">All Damage Types</option>
+                                    <option value="physical">Physical</option>
+                                    <option value="energy">Energy</option>
+                                    <option value="elemental">Elemental</option>
+                                </select>
+                                <select id="language-filter">
+                                    <option value="en">English</option>
+                                    <option value="th">ภาษาไทย</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="weapons-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-column="image">Image</th>
+                                        <th class="sortable" data-column="name">Name</th>
+                                        <th class="sortable" data-column="type">Type</th>
+                                        <th class="sortable" data-column="damage_type">Damage Type</th>
+                                        <th class="sortable" data-column="keyword_type">Keywords</th>
+                                        <th class="sortable" data-column="description">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="weapons-table-body">
+                                    <!-- Table rows will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="mods-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Mods</h2>
+                        <div class="view-controls">
+                            <button id="mods-card-view" class="view-btn active" title="Card View">
+                                <span class="view-icon">🃏</span>
+                                <span class="view-text">Cards</span>
+                            </button>
+                            <button id="mods-table-view" class="view-btn" title="Table View">
+                                <span class="view-icon">📊</span>
+                                <span class="view-text">Table</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card View -->
+                    <div id="mods-card-content" class="items-grid view-content">
+                        <!-- Mods cards will be loaded here -->
+                    </div>
+                    
+                    <!-- Table View -->
+                    <div id="mods-table-content" class="table-view view-content hidden">
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" id="mods-table-search" placeholder="Search mods...">
+                                <button id="mods-search-clear" class="clear-btn">✖️</button>
+                            </div>
+                            <div class="table-filters">
+                                <select id="mod-type-filter">
+                                    <option value="">All Mod Types</option>
+                                    <option value="Weapon">Weapon Mods</option>
+                                    <option value="Masks">Armor Mods</option>
+                                </select>
+                                <select id="mods-language-filter">
+                                    <option value="en">English</option>
+                                    <option value="th">ภาษาไทย</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="mods-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-column="image">Image</th>
+                                        <th class="sortable" data-column="name">Name</th>
+                                        <th class="sortable" data-column="type">Type</th>
+                                        <th class="sortable" data-column="for">For</th>
+                                        <th class="sortable" data-column="contents">Contents</th>
+                                        <th class="sortable" data-column="description">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mods-table-body">
+                                    <!-- Table rows will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="armor-section" class="content-section">
+                    <div class="section-header">
+                        <h2>Armor</h2>
+                        <div class="view-controls">
+                            <button id="armor-card-view" class="view-btn active" title="Card View">
+                                <span class="view-icon">🃏</span>
+                                <span class="view-text">Cards</span>
+                            </button>
+                            <button id="armor-table-view" class="view-btn" title="Table View">
+                                <span class="view-icon">📊</span>
+                                <span class="view-text">Table</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card View -->
+                    <div id="armor-card-content" class="items-grid view-content">
+                        <!-- Armor cards will be loaded here -->
+                    </div>
+                    
+                    <!-- Table View -->
+                    <div id="armor-table-content" class="table-view view-content hidden">
+                        <div class="table-controls">
+                            <div class="table-search">
+                                <input type="text" id="armor-table-search" placeholder="Search armor...">
+                                <button id="armor-search-clear" class="clear-btn">✖️</button>
+                            </div>
+                            <div class="table-filters">
+                                <select id="armor-type-filter">
+                                    <option value="">All Armor Types</option>
+                                    <option value="Helmet">Helmet</option>
+                                    <option value="Chest">Chest</option>
+                                    <option value="Gloves">Gloves</option>
+                                    <option value="Boots">Boots</option>
+                                    <option value="Full Set">Full Set</option>
+                                </select>
+                                <select id="armor-language-filter">
+                                    <option value="en">English</option>
+                                    <option value="th">ภาษาไทย</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="armor-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-column="image">Image</th>
+                                        <th class="sortable" data-column="name">Name</th>
+                                        <th class="sortable" data-column="gearset">Gear Set</th>
+                                        <th class="sortable" data-column="geartype">Gear Type</th>
+                                        <th class="sortable" data-column="type">Type</th>
+                                        <th class="sortable" data-column="description">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="armor-table-body">
+                                    <!-- Table rows will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="set-build-section" class="content-section">
+                    <h2>Set Build</h2>
+                    <div class="build-tools">
+                        <div class="build-actions">
+                            <button id="create-build-btn" class="btn-primary">Create New Build</button>
+                            <button id="import-build-btn" class="btn-secondary">Import Build</button>
+                        </div>
+                        
+                        <!-- Import Modal -->
+                        <div id="import-modal" class="modal hidden">
+                            <div class="modal-content">
+                                <h3>Import Build</h3>
+                                <textarea id="import-text" placeholder="Paste build string here..."></textarea>
+                                <div class="modal-actions">
+                                    <button id="import-confirm-btn" class="btn-primary">Import</button>
+                                    <button id="import-cancel-btn" class="btn-secondary">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Build Editor Modal -->
+                        <div id="build-editor-modal" class="modal hidden">
+                            <div class="modal-content build-editor">
+                                <div class="editor-header">
+                                    <input type="text" id="build-name-input" placeholder="Build Name" class="build-name-input">
+                                    <div class="editor-actions">
+                                        <button id="save-build-btn" class="btn-primary">💾 Save</button>
+                                        <button id="close-editor-btn" class="btn-secondary">✖️ Close</button>
+                                    </div>
+                                </div>
+
+                                <div class="build-editor-content">
+                                    <!-- Equipment Section -->
+                                    <div class="equipment-section">
+                                        <h3>🛡️ Equipment</h3>
+                                        <div class="equipment-grid">
+                                            <div class="equipment-slot" data-slot="helmet">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">⛑️</span>
+                                                    <span class="slot-name">Helmet</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="helmet">
+                                                        <option value="">Select Helmet</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="helmet-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="equipment-slot" data-slot="mask">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">😷</span>
+                                                    <span class="slot-name">Mask</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="mask">
+                                                        <option value="">Select Mask</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="mask-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="equipment-slot" data-slot="top">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">👕</span>
+                                                    <span class="slot-name">Top</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="top">
+                                                        <option value="">Select Top</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="top-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="equipment-slot" data-slot="bottom">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">👖</span>
+                                                    <span class="slot-name">Bottom</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="bottom">
+                                                        <option value="">Select Bottom</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="bottom-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="equipment-slot" data-slot="gloves">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">🧤</span>
+                                                    <span class="slot-name">Gloves</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="gloves">
+                                                        <option value="">Select Gloves</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="gloves-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="equipment-slot" data-slot="shoes">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">👢</span>
+                                                    <span class="slot-name">Shoes</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="shoes">
+                                                        <option value="">Select Shoes</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="shoes-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Weapons Section -->
+                                    <div class="weapons-section">
+                                        <h3>🔫 Weapons</h3>
+                                        <div class="weapons-grid">
+                                            <div class="weapon-slot" data-slot="weapon1">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">🔫</span>
+                                                    <span class="slot-name">Primary Weapon</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="weapon">
+                                                        <option value="">Select Weapon</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="weapon-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="weapon-slot" data-slot="weapon2">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">🔫</span>
+                                                    <span class="slot-name">Secondary Weapon</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="weapon">
+                                                        <option value="">Select Weapon</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="weapon-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="weapon-slot" data-slot="weapon3">
+                                                <div class="slot-header">
+                                                    <span class="slot-icon">🔫</span>
+                                                    <span class="slot-name">Tertiary Weapon</span>
+                                                </div>
+                                                <div class="slot-content">
+                                                    <select class="item-select" data-type="weapon">
+                                                        <option value="">Select Weapon</option>
+                                                    </select>
+                                                    <select class="mod-select" data-type="weapon-mod">
+                                                        <option value="">Select Mod</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="builds-content" class="builds-grid">
+                        <!-- Builds will be loaded here -->
+                    </div>
+                </section>
+
+                <section id="animals-section" class="content-section">
+                    <h2>Animals</h2>
+                    <div id="animals-content" class="items-grid">
+                        <!-- Animals will be loaded here -->
+                    </div>
+                </section>
+
+                <section id="food-section" class="content-section">
+                    <h2>Food</h2>
+                    <div id="food-content" class="items-grid">
+                        <!-- Food will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
