@@ -709,24 +709,40 @@ class OnceHumanApp {
                 })
             ]);
 
+            console.log('Loaded data:', { weaponsData, armorData, modsData });
+
             // Store data for later use
             this.gameData = {
-                weapons: weaponsData.weapons,
-                armor: armorData.armor || [],
+                weapons: weaponsData.weapons || weaponsData,
+                armor: armorData.armor || armorData,
                 mods: modsData
             };
 
             // Populate equipment selects - use armor array and filter by geartype
+            // Create mapping between UI types and JSON geartype values
+            const gearTypeMapping = {
+                'helmet': ['Helmet', 'helmet'],
+                'mask': ['Mask', 'mask'],
+                'top': ['Chest', 'Top', 'chest', 'top'],
+                'bottom': ['Bottom', 'Legs', 'Pants', 'bottom', 'legs', 'pants'],
+                'gloves': ['Gloves', 'Hands', 'gloves', 'hands'],
+                'shoes': ['Boots', 'Feet', 'Shoes', 'boots', 'feet', 'shoes']
+            };
+            
             const equipmentTypes = ['helmet', 'mask', 'top', 'bottom', 'gloves', 'shoes'];
             equipmentTypes.forEach(type => {
                 const itemSelect = document.querySelector(`[data-type="${type}"]`);
                 if (itemSelect) {
+                    console.log(`Populating ${type} select...`);
                     itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                     
-                    // Filter armor by geartype
+                    // Filter armor by geartype using mapping
+                    const validGearTypes = gearTypeMapping[type] || [type];
                     const armorItems = this.gameData.armor.filter(item => 
-                        item.geartype && item.geartype.toLowerCase() === type.toLowerCase()
+                        item.geartype && validGearTypes.includes(item.geartype)
                     );
+                    
+                    console.log(`Found ${armorItems.length} ${type} items:`, armorItems);
                     
                     armorItems.forEach(item => {
                         const option = document.createElement('option');
@@ -744,16 +760,19 @@ class OnceHumanApp {
 
             // Populate weapon selects
             const weaponSelects = document.querySelectorAll('[data-type="weapon"]');
+            console.log('Populating weapon selects...', this.gameData.weapons);
             weaponSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Weapon</option>';
-                weaponsData.weapons.forEach(weapon => {
-                    const option = document.createElement('option');
-                    option.value = weapon.name;
-                    option.textContent = weapon.name;
-                    option.setAttribute('data-img', weapon.img || '');
-                    option.setAttribute('data-type-info', weapon.type || '');
-                    select.appendChild(option);
-                });
+                if (this.gameData.weapons) {
+                    this.gameData.weapons.forEach(weapon => {
+                        const option = document.createElement('option');
+                        option.value = weapon.name;
+                        option.textContent = weapon.name;
+                        option.setAttribute('data-img', weapon.img || '');
+                        option.setAttribute('data-type-info', weapon.type || '');
+                        select.appendChild(option);
+                    });
+                }
                 
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(select);
@@ -762,6 +781,7 @@ class OnceHumanApp {
             // Populate all mod selects with comprehensive mod list
             const allMods = [...(modsData.weapon_mods || []), ...(modsData.armor_mods || [])];
             const modSelects = document.querySelectorAll('.mod-select');
+            console.log('Populating mod selects...', allMods);
             modSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Mod</option>';
                 allMods.forEach(mod => {
@@ -777,6 +797,8 @@ class OnceHumanApp {
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(select);
             });
+
+            console.log('Editor data loaded successfully');
 
         } catch (error) {
             console.warn('Cannot load JSON files (likely CORS issue when running locally):', error);
@@ -838,6 +860,7 @@ class OnceHumanApp {
         equipmentTypes.forEach(type => {
             const itemSelect = document.querySelector(`[data-type="${type}"]`);
             if (itemSelect && sampleData[type + 's']) {
+                console.log(`Populating fallback ${type} select...`);
                 itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                 sampleData[type + 's'].forEach(item => {
                     const option = document.createElement('option');
@@ -847,6 +870,8 @@ class OnceHumanApp {
                     itemSelect.appendChild(option);
                 });
                 
+                console.log(`Added ${sampleData[type + 's'].length} ${type} items`);
+                
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(itemSelect);
             }
@@ -854,6 +879,7 @@ class OnceHumanApp {
 
         // Populate weapon selects
         const weaponSelects = document.querySelectorAll('[data-type="weapon"]');
+        console.log('Populating fallback weapon selects...', weaponSelects.length, 'selects found');
         weaponSelects.forEach(select => {
             select.innerHTML = '<option value="">Select Weapon</option>';
             sampleData.weapons.forEach(weapon => {
@@ -865,6 +891,8 @@ class OnceHumanApp {
                 option.setAttribute('data-img', (typeof weapon === 'object' ? weapon.img : '') || '');
                 select.appendChild(option);
             });
+            
+            console.log(`Added ${sampleData.weapons.length} weapons to select`);
             
             // Convert to custom select with images
             this.enhanceSelectWithImages(select);
