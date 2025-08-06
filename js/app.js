@@ -526,6 +526,9 @@ class OnceHumanApp {
             return;
         }
         
+        // Clean up existing custom dropdowns before opening
+        this.cleanupCustomDropdowns();
+        
         modal.classList.remove('hidden');
 
         // Populate build name
@@ -553,6 +556,10 @@ class OnceHumanApp {
     closeBuildEditor() {
         const modal = document.getElementById('build-editor-modal');
         modal.classList.add('hidden');
+        
+        // Clean up custom dropdowns when closing
+        this.cleanupCustomDropdowns();
+        
         this.currentEditingBuildId = null;
     }
 
@@ -682,6 +689,9 @@ class OnceHumanApp {
     }
 
     async loadEditorData() {
+        // Clean up existing dropdowns first
+        this.cleanupCustomDropdowns();
+        
         try {
             // Try to load data from JSON files (works when served via HTTP)
             const [weaponsData, armorData, modsData] = await Promise.all([
@@ -777,6 +787,9 @@ class OnceHumanApp {
 
     loadFallbackData() {
         console.log('Loading fallback data for local testing...');
+        
+        // Clean up existing dropdowns first
+        this.cleanupCustomDropdowns();
         
         // Enhanced fallback data in case JSON files can't be loaded
         const sampleData = {
@@ -2113,9 +2126,42 @@ class OnceHumanApp {
         }
     }
 
+    // Clean up existing custom dropdowns
+    cleanupCustomDropdowns() {
+        // Remove all existing custom dropdown containers
+        const existingDropdowns = document.querySelectorAll('.custom-select-dropdown');
+        existingDropdowns.forEach(dropdown => {
+            dropdown.remove();
+        });
+        
+        // Show original select elements and reset enhancement flag
+        const allSelects = document.querySelectorAll('.item-select, .mod-select');
+        allSelects.forEach(select => {
+            select.style.display = '';
+            select.dataset.enhanced = 'false'; // Reset enhancement flag
+        });
+    }
+
     // Enhanced select with images
     enhanceSelectWithImages(selectElement) {
         try {
+            // Check if select already has been enhanced (prevent double enhancement)
+            if (selectElement.dataset.enhanced === 'true') {
+                return;
+            }
+            
+            // Clean up any existing custom dropdown for this select
+            const existingCustom = selectElement.parentNode.querySelector('.custom-select-dropdown');
+            if (existingCustom) {
+                existingCustom.remove();
+            }
+            
+            // Show original select
+            selectElement.style.display = '';
+            
+            // Mark as enhanced
+            selectElement.dataset.enhanced = 'true';
+            
             // Create custom dropdown container
             const customContainer = document.createElement('div');
             customContainer.className = 'custom-select-dropdown';
