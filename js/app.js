@@ -695,6 +695,7 @@ class OnceHumanApp {
 
     async loadEditorData() {
         try {
+            console.log('Starting to load editor data from JSON files...');
             // Try to load data from JSON files (works when served via HTTP)
             const [weaponsData, armorData, modsData] = await Promise.all([
                 fetch('data/weapons.json').then(r => {
@@ -711,6 +712,12 @@ class OnceHumanApp {
                 })
             ]);
 
+            console.log('Successfully loaded JSON data:');
+            console.log('- Weapons:', weaponsData.weapons?.length || 0);
+            console.log('- Armor:', armorData.armor?.length || 0);
+            console.log('- Weapon Mods:', modsData.weapon_mods?.length || 0);
+            console.log('- Armor Mods:', modsData.armor_mods?.length || 0);
+
             // Store data for later use
             this.gameData = {
                 weapons: weaponsData.weapons,
@@ -722,6 +729,7 @@ class OnceHumanApp {
             const equipmentTypes = ['helmet', 'mask', 'top', 'bottom', 'gloves', 'shoes'];
             equipmentTypes.forEach(type => {
                 const itemSelect = document.querySelector(`[data-type="${type}"]`);
+                console.log(`Looking for equipment select with data-type="${type}":`, !!itemSelect);
                 if (itemSelect) {
                     itemSelect.innerHTML = `<option value="">Select ${type.charAt(0).toUpperCase() + type.slice(1)}</option>`;
                     
@@ -729,6 +737,8 @@ class OnceHumanApp {
                     const armorItems = this.gameData.armor.filter(item => 
                         item.geartype && item.geartype.toLowerCase() === type.toLowerCase()
                     );
+                    
+                    console.log(`Found ${armorItems.length} ${type} items:`, armorItems.map(item => item.name));
                     
                     armorItems.forEach(item => {
                         const option = document.createElement('option');
@@ -746,7 +756,10 @@ class OnceHumanApp {
 
             // Populate weapon selects
             const weaponSelects = document.querySelectorAll('[data-type="weapon"]');
-            weaponSelects.forEach(select => {
+            console.log(`Found ${weaponSelects.length} weapon selects`);
+            console.log(`Weapons data:`, weaponsData.weapons.length, 'weapons');
+            weaponSelects.forEach((select, index) => {
+                console.log(`Populating weapon select ${index}:`, select);
                 select.innerHTML = '<option value="">Select Weapon</option>';
                 weaponsData.weapons.forEach(weapon => {
                     const option = document.createElement('option');
@@ -756,6 +769,8 @@ class OnceHumanApp {
                     option.setAttribute('data-type-info', weapon.type || '');
                     select.appendChild(option);
                 });
+                
+                console.log(`Weapon select ${index} now has ${select.options.length} options`);
                 
                 // Convert to custom select with images
                 this.enhanceSelectWithImages(select);
@@ -2131,9 +2146,11 @@ class OnceHumanApp {
             // Check if custom dropdown already exists - skip if already enhanced
             const existingCustom = selectElement.parentNode.querySelector('.custom-select-dropdown');
             if (existingCustom) {
-                console.log('Custom dropdown already exists, skipping enhancement');
+                console.log('Custom dropdown already exists, skipping enhancement for:', selectElement.dataset.type || selectElement.className);
                 return;
             }
+            
+            console.log('Enhancing select with options count:', selectElement.options.length, 'for type:', selectElement.dataset.type || selectElement.className);
 
             // Create custom dropdown container
             const customContainer = document.createElement('div');
