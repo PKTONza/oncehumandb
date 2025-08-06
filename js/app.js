@@ -776,12 +776,41 @@ class OnceHumanApp {
                 this.enhanceSelectWithImages(select);
             });
 
-            // Populate all mod selects with comprehensive mod list
+            // Populate mod selects with filtered mods based on geartype
             const allMods = [...(modsData.weapon_mods || []), ...(modsData.armor_mods || [])];
             const modSelects = document.querySelectorAll('.mod-select');
             modSelects.forEach(select => {
                 select.innerHTML = '<option value="">Select Mod</option>';
-                allMods.forEach(mod => {
+                
+                // Get the geartype from data-type attribute (e.g., "helmet-mod" -> "helmet")
+                const dataType = select.dataset.type || '';
+                const gearType = dataType.replace('-mod', ''); // Remove "-mod" suffix
+                
+                console.log(`Populating mod select for geartype: ${gearType}`);
+                
+                // Filter mods based on geartype
+                const filteredMods = allMods.filter(mod => {
+                    const modFor = mod.mod_for || '';
+                    
+                    // Check if mod is for "all" geartypes
+                    if (modFor.toLowerCase() === 'all') {
+                        return true;
+                    }
+                    
+                    // Check if mod is for weapons
+                    if (gearType === 'weapon' && modFor.toLowerCase() === 'weapon') {
+                        return true;
+                    }
+                    
+                    // Check if mod is for specific armor piece
+                    // Convert geartype to match mod_for format (helmet -> Helmet, mask -> Masks, etc.)
+                    const expectedModFor = this.convertGearTypeToModFor(gearType);
+                    return modFor === expectedModFor;
+                });
+                
+                console.log(`Found ${filteredMods.length} compatible mods for ${gearType}:`, filteredMods.map(m => m.mod_name));
+                
+                filteredMods.forEach(mod => {
                     const modName = mod.mod_name || mod.name || 'Unknown Mod';
                     const option = document.createElement('option');
                     option.value = modName;
@@ -840,10 +869,45 @@ class OnceHumanApp {
                 { id: 6, name: 'Pistol', type: 'weapon', damage_type: 'physical', keyword_type: 'Pistol, Semi' }
             ],
             mods: [
-                'Red Dot Sight', '8x Scope', '12x Scope', 'Silencer', 'Extended Magazine', 
-                'Foregrip', 'Compensator', 'Laser Sight', 'Flashlight', 'Bipod',
-                'Durability Boost', 'Armor Plating', 'Stealth Enhancement', 'Night Vision',
-                'Grip Enhancement', 'Quick Reload', 'Extra Pockets', 'Silent Step'
+                // Weapon mods
+                { mod_name: 'Red Dot Sight', mod_for: 'Weapon' },
+                { mod_name: '8x Scope', mod_for: 'Weapon' },
+                { mod_name: '12x Scope', mod_for: 'Weapon' },
+                { mod_name: 'Silencer', mod_for: 'Weapon' },
+                { mod_name: 'Extended Magazine', mod_for: 'Weapon' },
+                { mod_name: 'Foregrip', mod_for: 'Weapon' },
+                { mod_name: 'Compensator', mod_for: 'Weapon' },
+                { mod_name: 'Laser Sight', mod_for: 'Weapon' },
+                { mod_name: 'Flashlight', mod_for: 'Weapon' },
+                { mod_name: 'Bipod', mod_for: 'Weapon' },
+                
+                // Helmet mods\n                { mod_name: 'Night Vision', mod_for: 'Helmet' },
+                { mod_name: 'Communication System', mod_for: 'Helmet' },
+                
+                // Mask mods
+                { mod_name: 'Air Filter', mod_for: 'Masks' },
+                { mod_name: 'Gas Protection', mod_for: 'Masks' },
+                
+                // Chest/Top mods
+                { mod_name: 'Armor Plating', mod_for: 'Chest' },
+                { mod_name: 'Extra Pockets', mod_for: 'Chest' },
+                
+                // Legs/Bottom mods
+                { mod_name: 'Knee Pads', mod_for: 'Legs' },
+                { mod_name: 'Movement Enhancement', mod_for: 'Legs' },
+                
+                // Gloves mods
+                { mod_name: 'Grip Enhancement', mod_for: 'Gloves' },
+                { mod_name: 'Dexterity Boost', mod_for: 'Gloves' },
+                
+                // Boots/Shoes mods
+                { mod_name: 'Silent Step', mod_for: 'Boots' },
+                { mod_name: 'Speed Boost', mod_for: 'Boots' },
+                
+                // Universal mods (for all gear types)
+                { mod_name: 'Durability Boost', mod_for: 'all' },
+                { mod_name: 'Stealth Enhancement', mod_for: 'all' },
+                { mod_name: 'Quick Reload', mod_for: 'all' }
             ]
         };
 
@@ -884,15 +948,33 @@ class OnceHumanApp {
             this.enhanceSelectWithImages(select);
         });
 
-        // Populate all mod selects
+        // Populate mod selects with filtered mods (fallback version)
         const modSelects = document.querySelectorAll('.mod-select');
         modSelects.forEach(select => {
             select.innerHTML = '<option value="">Select Mod</option>';
-            sampleData.mods.forEach(mod => {
+            
+            // Get the geartype from data-type attribute
+            const dataType = select.dataset.type || '';
+            const gearType = dataType.replace('-mod', '');
+            
+            // Filter mods based on geartype
+            const filteredMods = sampleData.mods.filter(mod => {
+                const modFor = mod.mod_for || '';
+                
+                if (modFor.toLowerCase() === 'all') return true;
+                if (gearType === 'weapon' && modFor.toLowerCase() === 'weapon') return true;
+                
+                const expectedModFor = this.convertGearTypeToModFor(gearType);
+                return modFor === expectedModFor;
+            });
+            
+            filteredMods.forEach(mod => {
+                const modName = mod.mod_name || mod;
                 const option = document.createElement('option');
-                option.value = mod;
-                option.textContent = mod;
+                option.value = modName;
+                option.textContent = modName;
                 option.setAttribute('data-img', ''); // No images in fallback data
+                option.setAttribute('data-mod-for', mod.mod_for || '');
                 select.appendChild(option);
             });
             
@@ -901,6 +983,20 @@ class OnceHumanApp {
         });
 
         this.showNotification('Loaded fallback data (JSON files not available)', 'info');
+    }
+    
+    // Helper function to convert geartype to mod_for format
+    convertGearTypeToModFor(gearType) {
+        const mapping = {
+            'helmet': 'Helmet',
+            'mask': 'Masks', // Note: plural in data
+            'top': 'Chest',
+            'bottom': 'Legs',
+            'gloves': 'Gloves',
+            'shoes': 'Boots',
+            'weapon': 'Weapon'
+        };
+        return mapping[gearType.toLowerCase()] || gearType;
     }
 
     setupEditorChangeListeners() {
@@ -2160,7 +2256,10 @@ class OnceHumanApp {
                 width: 100%;
             `;
 
-            // Create display element (shows selected item)
+            // Check if this select should have search functionality
+            const hasSearch = selectElement.classList.contains('item-select') || selectElement.classList.contains('mod-select');
+            
+            // Create display element (shows selected item or search input)
             const displayElement = document.createElement('div');
             displayElement.className = 'select-display';
             displayElement.style.cssText = `
@@ -2176,6 +2275,24 @@ class OnceHumanApp {
                 position: relative;
                 user-select: none;
             `;
+            
+            // Create search input for searchable dropdowns
+            let searchInput = null;
+            if (hasSearch) {
+                searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.placeholder = 'Search or select...';
+                searchInput.className = 'dropdown-search';
+                searchInput.style.cssText = `
+                    border: none;
+                    background: transparent;
+                    outline: none;
+                    flex: 1;
+                    font-size: 0.9rem;
+                    color: var(--text-primary);
+                    display: none;
+                `;
+            }"}
 
             // Create dropdown arrow
             const arrow = document.createElement('span');
@@ -2188,7 +2305,9 @@ class OnceHumanApp {
                 pointer-events: none;
             `;
 
-            displayElement.appendChild(arrow);
+            if (searchInput) {
+                displayElement.appendChild(searchInput);
+            }\n            displayElement.appendChild(arrow);
 
             // Create dropdown list
             const dropdownList = document.createElement('div');
@@ -2207,59 +2326,95 @@ class OnceHumanApp {
                 display: none;
                 box-shadow: 0 4px 15px var(--shadow-dark);
             `;
+            
+            // Store original options for search filtering
+            const originalOptions = Array.from(selectElement.options);"
 
-            // Populate dropdown list
-            Array.from(selectElement.options).forEach((option, index) => {
-                const item = document.createElement('div');
-                item.className = 'select-option';
-                item.style.cssText = `
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    padding: 8px 12px;
-                    cursor: pointer;
-                    transition: background 0.2s ease;
-                `;
+            // Function to populate/repopulate dropdown list
+            const populateDropdownList = (options) => {
+                dropdownList.innerHTML = '';
+                options.forEach((option, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'select-option';
+                    item.dataset.originalIndex = Array.from(selectElement.options).indexOf(option);
+                    item.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 8px 12px;
+                        cursor: pointer;
+                        transition: background 0.2s ease;
+                    `;
 
-                const img = option.getAttribute('data-img');
-                const imgElement = document.createElement('div');
+                    const img = option.getAttribute('data-img');
+                    const imgElement = document.createElement('div');
+                    
+                    if (img && img !== '') {
+                        imgElement.innerHTML = `<img src="${img}" alt="${option.textContent}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                               <div class="no-image" style="display: none; width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
+                    } else {
+                        imgElement.innerHTML = `<div class="no-image" style="width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
+                    }
+
+                    const textElement = document.createElement('span');
+                    textElement.textContent = option.textContent;
+                    textElement.style.cssText = `
+                        flex: 1;
+                        font-size: 0.9rem;
+                        color: var(--text-primary);
+                    `;
+
+                    item.appendChild(imgElement);
+                    item.appendChild(textElement);
+
+                    // Add hover effect
+                    item.addEventListener('mouseenter', () => {
+                        item.style.background = 'var(--bg-tertiary)';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.background = 'transparent';
+                    });
+
+                    // Add click handler
+                    item.addEventListener('click', () => {
+                        const originalIndex = parseInt(item.dataset.originalIndex);
+                        selectElement.selectedIndex = originalIndex;
+                        selectElement.dispatchEvent(new Event('change'));
+                        this.updateSelectDisplay(displayElement, option, hasSearch, searchInput);
+                        dropdownList.style.display = 'none';
+                        
+                        // Hide search input and show selected item
+                        if (hasSearch && searchInput) {
+                            searchInput.style.display = 'none';
+                            searchInput.value = '';
+                        }
+                    });
+
+                    dropdownList.appendChild(item);
+                });
+            };
+            
+            // Initial population
+            populateDropdownList(originalOptions);
+            
+            // Add search functionality
+            if (hasSearch && searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredOptions = originalOptions.filter(option => 
+                        option.textContent.toLowerCase().includes(searchTerm)
+                    );
+                    populateDropdownList(filteredOptions);
+                });
                 
-                if (img && img !== '') {
-                    imgElement.innerHTML = `<img src="${img}" alt="${option.textContent}" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border-color);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                           <div class="no-image" style="display: none; width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
-                } else {
-                    imgElement.innerHTML = `<div class="no-image" style="width: 24px; height: 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-dim);">🖼️</div>`;
-                }
-
-                const textElement = document.createElement('span');
-                textElement.textContent = option.textContent;
-                textElement.style.cssText = `
-                    flex: 1;
-                    font-size: 0.9rem;
-                    color: var(--text-primary);
-                `;
-
-                item.appendChild(imgElement);
-                item.appendChild(textElement);
-
-                // Add hover effect
-                item.addEventListener('mouseenter', () => {
-                    item.style.background = 'var(--bg-tertiary)';
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        dropdownList.style.display = 'none';
+                        searchInput.style.display = 'none';
+                        searchInput.value = '';
+                    }
                 });
-                item.addEventListener('mouseleave', () => {
-                    item.style.background = 'transparent';
-                });
-
-                // Add click handler
-                item.addEventListener('click', () => {
-                    selectElement.selectedIndex = index;
-                    selectElement.dispatchEvent(new Event('change'));
-                    this.updateSelectDisplay(displayElement, option);
-                    dropdownList.style.display = 'none';
-                });
-
-                dropdownList.appendChild(item);
-            });
+            }
 
             // Toggle dropdown
             displayElement.addEventListener('click', (e) => {
@@ -2271,9 +2426,23 @@ class OnceHumanApp {
                     list.style.display = 'none';
                 });
                 
-                dropdownList.style.display = isOpen ? 'none' : 'block';
+                // Hide all search inputs
+                document.querySelectorAll('.dropdown-search').forEach(input => {
+                    input.style.display = 'none';
+                    input.value = '';
+                });
                 
                 if (!isOpen) {
+                    dropdownList.style.display = 'block';
+                    
+                    // Show search input for searchable dropdowns
+                    if (hasSearch && searchInput) {
+                        searchInput.style.display = 'block';
+                        searchInput.focus();
+                        // Reset to show all options when opening
+                        populateDropdownList(originalOptions);
+                    }
+                    
                     // Position dropdown
                     const rect = displayElement.getBoundingClientRect();
                     const spaceBelow = window.innerHeight - rect.bottom;
@@ -2295,7 +2464,7 @@ class OnceHumanApp {
             });
 
             // Initialize display
-            this.updateSelectDisplay(displayElement, selectElement.options[0]);
+            this.updateSelectDisplay(displayElement, selectElement.options[0], hasSearch, searchInput);
 
             // Build custom dropdown
             customContainer.appendChild(displayElement);
@@ -2325,9 +2494,23 @@ class OnceHumanApp {
         });
     }
 
-    updateSelectDisplay(displayElement, option) {
+    updateSelectDisplay(displayElement, option, hasSearch = false, searchInput = null) {
         const arrow = displayElement.querySelector('span');
         displayElement.innerHTML = '';
+        
+        // Add search input first if it exists
+        if (hasSearch && searchInput) {
+            displayElement.appendChild(searchInput);
+        }
+        
+        // Create content container for selected item display
+        const contentContainer = document.createElement('div');
+        contentContainer.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        `;
         
         if (option && option.value) {
             const img = option.getAttribute('data-img');
@@ -2348,18 +2531,20 @@ class OnceHumanApp {
                 color: var(--text-primary);
             `;
 
-            displayElement.appendChild(imgElement);
-            displayElement.appendChild(textElement);
+            contentContainer.appendChild(imgElement);
+            contentContainer.appendChild(textElement);
         } else {
             const placeholderText = document.createElement('span');
-            placeholderText.textContent = 'Select an item...';
+            placeholderText.textContent = hasSearch ? 'Search or select...' : 'Select an item...';
             placeholderText.style.cssText = `
                 color: var(--text-dim);
                 font-style: italic;
+                flex: 1;
             `;
-            displayElement.appendChild(placeholderText);
+            contentContainer.appendChild(placeholderText);
         }
         
+        displayElement.appendChild(contentContainer);
         displayElement.appendChild(arrow);
     }
 
