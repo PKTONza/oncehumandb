@@ -2901,7 +2901,10 @@ class OnceHumanApp {
         
         if (categoryFilter) {
             categoryFilter.addEventListener('change', (e) => {
-                this.filterChallengesTableByCategory(e.target.value);
+                const selectedCategory = e.target.value;
+                this.filterChallengesTableByCategory(selectedCategory);
+                // Update dropdown color based on selected category
+                this.updateCategoryFilterAppearance(categoryFilter, selectedCategory);
             });
         }
         
@@ -2987,6 +2990,25 @@ class OnceHumanApp {
             'PvP': 'category-pvp'
         };
         return categoryClasses[category] || 'category-general';
+    }
+
+    updateCategoryFilterAppearance(filterElement, selectedCategory) {
+        // Remove all existing data-selected attributes
+        const categories = ['Combat', 'Collection', 'Exploration', 'Crafting', 'Survival', 'Building', 'Taming', 'Quest', 'Mining', 'PvP'];
+        categories.forEach(cat => {
+            filterElement.removeAttribute(`data-selected`);
+        });
+        
+        // Add the new selected category
+        if (selectedCategory && selectedCategory !== '') {
+            filterElement.setAttribute('data-selected', selectedCategory);
+            
+            // Add a subtle animation
+            filterElement.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                filterElement.style.transform = 'scale(1)';
+            }, 200);
+        }
     }
 }
 

@@ -1642,6 +1642,256 @@ body {
     color: var(--text-dim);
 }
 
+/* Enhanced Dropdown Styling for Challenges */
+#challenges-category-filter,
+#challenges-language-filter {
+    padding: 10px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 150px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+/* Dropdown focus ring effect */
+#challenges-category-filter::before,
+#challenges-language-filter::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary), var(--accent-primary));
+    border-radius: 10px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#challenges-category-filter:focus::before,
+#challenges-language-filter:focus::before {
+    opacity: 0.3;
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.02);
+    }
+}
+
+#challenges-category-filter:hover,
+#challenges-language-filter:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 4px 15px var(--border-light);
+    transform: translateY(-1px);
+}
+
+#challenges-category-filter:focus,
+#challenges-language-filter:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 15px var(--border-light);
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+}
+
+/* Custom dropdown arrow styling */
+#challenges-category-filter,
+#challenges-language-filter {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    padding-right: 40px;
+}
+
+/* Light theme dropdown arrow */
+[data-theme="light"] #challenges-category-filter,
+[data-theme="light"] #challenges-language-filter {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212529' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Dropdown option styling */
+#challenges-category-filter option,
+#challenges-language-filter option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 12px;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#challenges-category-filter option:hover,
+#challenges-language-filter option:hover {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Selected option styling */
+#challenges-category-filter option:checked,
+#challenges-language-filter option:checked {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    font-weight: bold;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Category-specific dropdown colors when selected */
+#challenges-category-filter[data-selected="Combat"] {
+    border-color: #e74c3c;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+#challenges-category-filter[data-selected="Collection"] {
+    border-color: #2ecc71;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+#challenges-category-filter[data-selected="Exploration"] {
+    border-color: #f39c12;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+#challenges-category-filter[data-selected="Crafting"] {
+    border-color: #9b59b6;
+    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+}
+
+#challenges-category-filter[data-selected="Survival"] {
+    border-color: #34495e;
+    box-shadow: 0 4px 15px rgba(52, 73, 94, 0.3);
+}
+
+#challenges-category-filter[data-selected="Building"] {
+    border-color: #16a085;
+    box-shadow: 0 4px 15px rgba(22, 160, 133, 0.3);
+}
+
+#challenges-category-filter[data-selected="Taming"] {
+    border-color: #e67e22;
+    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+}
+
+#challenges-category-filter[data-selected="Quest"] {
+    border-color: #3498db;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+#challenges-category-filter[data-selected="Mining"] {
+    border-color: #95a5a6;
+    box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+}
+
+#challenges-category-filter[data-selected="PvP"] {
+    border-color: #c0392b;
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+}
+
+/* Tooltip styling for dropdowns */
+#challenges-category-filter,
+#challenges-language-filter {
+    position: relative;
+}
+
+#challenges-category-filter:hover::after {
+    content: 'Filter challenges by category';
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    animation: tooltip-show 0.3s ease forwards;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#challenges-language-filter:hover::after {
+    content: 'Switch table language';
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    animation: tooltip-show 0.3s ease forwards;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes tooltip-show {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Table filters container improvements */
+.table-filters {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Clear button improvements */
+#challenges-search-clear {
+    background: linear-gradient(135deg, var(--accent-danger), #c0392b);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+#challenges-search-clear:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5);
+}
+
+#challenges-search-clear:active {
+    transform: scale(0.95);
+}
+
 .table-id {
     font-weight: bold;
     color: var(--accent-primary);
@@ -1792,6 +2042,29 @@ body {
         font-size: 0.7rem;
         padding: 3px 8px;
     }
+    
+    /* Mobile dropdown adjustments */
+    #challenges-category-filter,
+    #challenges-language-filter {
+        min-width: 120px;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        padding-right: 35px;
+    }
+    
+    .table-filters {
+        gap: 10px;
+    }
+    
+    .table-controls {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .table-search {
+        min-width: auto;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1811,5 +2084,39 @@ body {
         width: 40px;
         height: 40px;
         font-size: 1rem;
+    }
+    
+    /* Extra small screen dropdown adjustments */
+    #challenges-category-filter,
+    #challenges-language-filter {
+        min-width: 100px;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        padding-right: 30px;
+        background-size: 14px 14px;
+        background-position: right 8px center;
+    }
+    
+    #challenges-search-clear {
+        width: 30px;
+        height: 30px;
+        font-size: 0.7rem;
+    }
+    
+    .table-filters {
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    /* Make dropdowns stack on very small screens */
+    .table-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    #challenges-category-filter,
+    #challenges-language-filter {
+        width: 100%;
+        min-width: auto;
     }
 }
