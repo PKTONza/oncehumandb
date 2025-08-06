@@ -554,6 +554,9 @@ class OnceHumanApp {
         const modal = document.getElementById('build-editor-modal');
         modal.classList.add('hidden');
         this.currentEditingBuildId = null;
+        
+        // Cleanup custom dropdowns to prevent duplication
+        this.cleanupCustomDropdowns();
     }
 
     saveBuildFromEditor() {
@@ -682,6 +685,9 @@ class OnceHumanApp {
     }
 
     async loadEditorData() {
+        // Cleanup existing custom dropdowns first
+        this.cleanupCustomDropdowns();
+        
         try {
             // Try to load data from JSON files (works when served via HTTP)
             const [weaponsData, armorData, modsData] = await Promise.all([
@@ -776,6 +782,9 @@ class OnceHumanApp {
     }
 
     loadFallbackData() {
+        // Cleanup existing custom dropdowns first
+        this.cleanupCustomDropdowns();
+        
         console.log('Loading fallback data for local testing...');
         
         // Enhanced fallback data in case JSON files can't be loaded
@@ -2116,6 +2125,15 @@ class OnceHumanApp {
     // Enhanced select with images
     enhanceSelectWithImages(selectElement) {
         try {
+            // Check if custom dropdown already exists and remove it
+            const existingCustom = selectElement.parentNode.querySelector('.custom-select-dropdown');
+            if (existingCustom) {
+                existingCustom.remove();
+            }
+
+            // Show original select temporarily to avoid issues
+            selectElement.style.display = 'block';
+
             // Create custom dropdown container
             const customContainer = document.createElement('div');
             customContainer.className = 'custom-select-dropdown';
@@ -2272,7 +2290,22 @@ class OnceHumanApp {
         } catch (error) {
             console.warn('Could not enhance select with images:', error);
             // Fallback - just use the original select
+            selectElement.style.display = 'block';
         }
+    }
+
+    // Cleanup function to remove all custom dropdowns
+    cleanupCustomDropdowns() {
+        const customDropdowns = document.querySelectorAll('.custom-select-dropdown');
+        customDropdowns.forEach(dropdown => {
+            dropdown.remove();
+        });
+        
+        // Show original selects
+        const originalSelects = document.querySelectorAll('.item-select, .mod-select');
+        originalSelects.forEach(select => {
+            select.style.display = 'block';
+        });
     }
 
     updateSelectDisplay(displayElement, option) {
